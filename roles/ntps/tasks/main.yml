@@ -1,0 +1,88 @@
+---
+- name: makecache fast
+  command: yum makecache fast
+
+- name: updating package
+  yum:
+    name: '*'
+    state: latest
+
+- name: installing epel-release
+  yum:
+    name: epel-release
+    state: latest
+
+- name: installing bind-utils
+  yum:
+    name: bind-utils
+    state: latest
+
+- name: installing chrony
+  yum:
+    name: chrony
+    state: latest
+
+- name: configuring /etc/chrony.conf
+  template:
+    src: chronytemplate.j2
+    dest: /etc/chrony.conf
+    backup: yes
+
+- name: starting and enabling chrony service
+  service:
+    name: chronyd
+    state: started
+    enabled: yes
+
+- name: grabbing UUID
+  command: nmcli -g uuid con show
+  register: uuid_result
+
+- name: configuring IP address
+  template:
+    src: ipconfig.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-enp0s3
+    backup: yes
+
+- name: getting a hostname
+  command: hostname
+  register: current_hostname
+
+- name: setting hostname to ntp-server-205.ziyotek.local
+  hostname:
+    name: ntp-server-205.ziyotek.local
+  when: current_hostname.stdout != "ntp-server-205.ziyotek.local"
+
+- name: setting firewall rules
+  firewalld:
+    service: ntp
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: setting firewall rules
+  firewalld:
+    service: dns
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: creating a user
+  user:
+    name: adam
+    state: present
+    create_home: yes
+
+- name: adding adam to sudoers file
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^adam'
+    line: 'adam ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+
+- name: restarting network
+  service:
+    name: network
+    state: restarted
+
