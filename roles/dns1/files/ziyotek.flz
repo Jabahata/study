@@ -1,6 +1,6 @@
 $TTL 1D
 @       IN SOA                          dns-server-55.ziyotek.local. root.dns-server-55.ziyotek.local. (
-                                        2024020501      ; serial
+                                        2024020701      ; serial
                                         1D              ; refresh
                                         1H              ; retry
                                         1W              ; expire
@@ -22,8 +22,16 @@ web-server-61         IN      A       192.168.1.61
 web-load-62           IN      A       192.168.1.62
 
 db-server-65          IN      A       192.168.1.65
-
 docker-server-70      IN      A       192.168.1.70
+
+nfs-server-75         IN      A       192.168.1.75
+autofs-server-76      IN      A       192.168.1.76
+
+ldap-server-80        IN      A       192.168.1.80
+nagios-server-82      IN      A       192.168.1.82
+
+ansible-server-130    IN      A       192.168.1.130
+ansible-client-132    IN      A       192.168.1.132
 
 ; CNAME records
 ntp1                  IN      CNAME   ntp-server-50.ziyotek.local.
@@ -38,3 +46,12 @@ load                  IN      CNAME   web-load-62.ziyotek.local.
 
 db                    IN      CNAME   db-server-65.ziyotek.local.
 dock                  IN      CNAME   docker-server-70.ziyotek.local.
+
+nfs                   IN      CNAME   nfs-server-75.ziyotek.local.
+autofs                IN      CNAME   autofs-server-76.ziyotek.local.
+
+ldap                  IN      CNAME   ldap-server-80.ziyotek.local.
+nagios                IN      CNAME   nagios-server-82.ziyotek.local.
+
+ans1                  IN      CNAME   ansible-server-130.ziyotek.local.
+ans2                  IN      CNAME   ansible-client-132.ziyotek.local.

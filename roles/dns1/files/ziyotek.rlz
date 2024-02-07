@@ -1,6 +1,6 @@
 $TTL 1D
 @       IN SOA                          dns-server-55.ziyotek.local. root.dns-server-55.ziyotek.local. (
-                                        2024020501      ; serial
+                                        2024020701      ; serial
                                         1D              ; refresh
                                         1H              ; retry
                                         1W              ; expire
@@ -23,3 +23,12 @@ $TTL 1D
 
 65      IN      PTR     db-server-65.ziyotek.local.
 70      IN      PTR     docker-server-70.ziyotek.local.
+
+75      IN      PTR     nfs-server-75.ziyotek.local.
+76      IN      PTR     autofs-server-76.ziyotek.local.
+
+80      IN      PTR     ldap-server-80.ziyotek.local.
+82      IN      PTR     nagios-server-82.ziyotek.local.
+
+130     IN      PTR     ansible-server-130.ziyotek.local.
+132     IN      PTR     ansible-client-132.ziyotek.local.
