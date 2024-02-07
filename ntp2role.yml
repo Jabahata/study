@@ -1,0 +1,7 @@
+---
+- name: ntp2 192.168.1.51 from scratch
+  hosts: ntp2
+  become: yes
+
+  roles:
+  - ntp2

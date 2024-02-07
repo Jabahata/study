@@ -1,6 +1,6 @@
 ---
-- name: Installing NTP server from scratch
-  hosts: ntp
+- name: ntp1 192.168.1.50 from scratch
+  hosts: ntp1
   become: yes
 
   roles:
