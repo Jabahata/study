@@ -1,6 +1,8 @@
 ---
 - name: making cache
-  command: yum makecache fast
+  yum:
+    update_cache: yes
+    cache_valid_time: 3600
 
 - name: updating packages
   yum:
@@ -17,18 +19,21 @@
     name:
       - bind
       - bind-utils
-    state: latest
-    update_cache: yes
+    state: present
 
 - name: checking if chrony installed
   stat:
     path: /bin/chronyc
   register: chrony_check
 
+- name: debugging chrony check result
+  debug:
+    msg: "chrony check result: {{ chrony_check }}"
+
 - name: installing chrony
   yum:
     name: chrony
-    state: latest
+    state: present
   when: not chrony_check.stat.exists
 
 - name: configuring /etc/chrony.conf
@@ -37,19 +42,20 @@
     dest: /etc/chrony.conf
     backup: yes
 
-- name: restart chrony if its installed
+- name: restart chrony, if its installed
   service:
     name: chronyd
     state: restarted
   when: chrony_check.stat.exists
 
-- name: starting and enabling service
+- name: starting and enabling service if not installed
   service:
     name: chronyd
     state: started
     enabled: yes
+  when: not chrony_check.stat.exists
 
-- name: get uuid of enp0s3
+- name: getting uuid of network
   command: nmcli -g uuid con show
   register: uuid_result
 
@@ -59,11 +65,11 @@
     dest: /etc/sysconfig/network-scripts/ifcfg-enp0s3
     backup: yes
 
-- name: getting current hostname
+- name: getting a hostname
   shell: hostname
   register: current_hostname
 
-- name: set hostname to dns-server-55.ziyotek.local
+- name: setting a hostname
   hostname:
     name: dns-server-55.ziyotek.local
   when: current_hostname.stdout != "dns-server-55.ziyotek.local"
@@ -74,7 +80,7 @@
     dest: /etc/named.conf
     backup: yes
 
-- name: making ziyotek.flz
+- name: creating ziyotek.flz
   copy:
     src: ziyotek.flz
     dest: /var/named/ziyotek.flz
@@ -82,7 +88,7 @@
     group: named
     mode: '0640'
 
-- name: making ziyotek.rlz
+- name: creating ziyotek.rlz
   copy:
     src: ziyotek.rlz
     dest: /var/named/ziyotek.rlz
@@ -90,11 +96,27 @@
     group: named
     mode: '0640'
 
-- name: starting and enabling named
+- name: checking if named is installed
+  stat:
+    path: /usr/sbin/named
+  register: named_check
+
+- name: debugging named check result
+  debug:
+    msg: "named check result: {{ named_check }}"
+
+- name: restart named, if its installed
+  service:
+    name: named
+    state: restarted
+  when: named_check.stat.exists
+
+- name: starting and enabling named, if not installed
   service:
     name: named
     state: started
     enabled: yes
+  when: not named_check.stat.exists
 
 - name: setting firewall rules for ntp
   firewalld:
@@ -115,13 +137,13 @@
     name: firewalld
     state: reloaded
 
-- name: creating user 'adam'
+- name: creating user "adam"
   user:
     name: adam
     state: present
     create_home: yes
 
-- name: adding adam to sudoers file
+- name: adding "adam" to sudoers file
   lineinfile:
     path: /etc/sudoers
     state: present
