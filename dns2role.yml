@@ -1,0 +1,7 @@
+---
+- name: dns1 192.168.1.55 from scratch
+  hosts: dns1
+  become: yes
+
+  roles:
+  - dns1
