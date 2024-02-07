@@ -1,8 +1,8 @@
 ---
-- name: makecache fast
+- name: making cache
   command: yum makecache fast
 
-- name: updating package
+- name: updating packages
   yum:
     name: '*'
     state: latest
@@ -10,12 +10,15 @@
 - name: installing epel-release
   yum:
     name: epel-release
-    state: latest
+    state: present
 
-- name: installing bind-utils
+- name: installing bind and bind-utils
   yum:
-    name: bind-utils
+    name:
+      - bind
+      - bind-utils
     state: latest
+    update_cache: yes
 
 - name: checking if chrony installed
   stat:
@@ -30,7 +33,7 @@
 
 - name: configuring /etc/chrony.conf
   template:
-    src: chronytemplate.j2
+    src: chronyconf.j2
     dest: /etc/chrony.conf
     backup: yes
 
@@ -45,47 +48,74 @@
     name: chronyd
     state: started
     enabled: yes
-  when: not chrony_check.stat.exists
 
-- name: grabbing UUID
+- name: get uuid of enp0s3
   command: nmcli -g uuid con show
   register: uuid_result
 
 - name: configuring IP address
   template:
-    src: ipconfig.j2
+    src: interface.j2
     dest: /etc/sysconfig/network-scripts/ifcfg-enp0s3
     backup: yes
 
-- name: getting a hostname
-  command: hostname
+- name: getting current hostname
+  shell: hostname
   register: current_hostname
 
-- name: setting hostname to ntp-server-205.ziyotek.local
+- name: set hostname to dns-server-55.ziyotek.local
   hostname:
-    name: ntp-server-205.ziyotek.local
-  when: current_hostname.stdout != "ntp-server-205.ziyotek.local"
+    name: dns-server-55.ziyotek.local
+  when: current_hostname.stdout != "dns-server-55.ziyotek.local"
 
-- name: setting firewall rules
+- name: configuring /etc/named.conf
+  template:
+    src: namedconf.j2
+    dest: /etc/named.conf
+    backup: yes
+
+- name: making ziyotek.flz
+  copy:
+    src: ziyotek.flz
+    dest: /var/named/ziyotek.flz
+    owner: root
+    group: named
+    mode: '0640'
+
+- name: making ziyotek.rlz
+  copy:
+    src: ziyotek.rlz
+    dest: /var/named/ziyotek.rlz
+    owner: root
+    group: named
+    mode: '0640'
+
+- name: starting and enabling named
+  service:
+    name: named
+    state: started
+    enabled: yes
+
+- name: setting firewall rules for ntp
   firewalld:
     service: ntp
     permanent: yes
     immediate: yes
     state: enabled
 
-- name: setting firewall rules
+- name: setting firewall rules for dns
   firewalld:
     service: dns
     permanent: yes
     immediate: yes
     state: enabled
-
+    
 - name: reloading firewalld
   service:
     name: firewalld
     state: reloaded
 
-- name: creating a user
+- name: creating user 'adam'
   user:
     name: adam
     state: present
@@ -103,4 +133,3 @@
   service:
     name: network
     state: restarted
-

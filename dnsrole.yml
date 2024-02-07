@@ -1,0 +1,7 @@
+---
+- name: DNS from scratch
+  hosts: test
+  become: yes
+
+  roles:
+  - dns
