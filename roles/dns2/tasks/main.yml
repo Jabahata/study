@@ -14,6 +14,15 @@
     name: epel-release
     state: present
 
+- name: checking if named is installed
+  stat:
+    path: /usr/sbin/named
+  register: named_check
+
+- name: debugging named check result
+  debug:
+    msg: "named check result: {{ named_check }}"
+
 - name: installing bind and bind-utils
   yum:
     name:
@@ -71,8 +80,8 @@
 
 - name: setting a hostname
   hostname:
-    name: dns-server-55.ziyotek.local
-  when: current_hostname.stdout != "dns-server-55.ziyotek.local"
+    name: dns-server-56.ziyotek.local
+  when: current_hostname.stdout != "dns-server-56.ziyotek.local"
 
 - name: configuring /etc/named.conf
   template:
@@ -80,31 +89,12 @@
     dest: /etc/named.conf
     backup: yes
 
-- name: creating ziyotek.flz
-  copy:
-    src: ziyotek.flz
-    dest: /var/named/ziyotek.flz
-    owner: root
-    group: named
-    mode: '0640'
+- name: Reload ziyotek.local zone
+  command: rndc reload ziyotek.local
 
-- name: creating ziyotek.rlz
-  copy:
-    src: ziyotek.rlz
-    dest: /var/named/ziyotek.rlz
-    owner: root
-    group: named
-    mode: '0640'
-
-- name: checking if named is installed
-  stat:
-    path: /usr/sbin/named
-  register: named_check
-
-- name: debugging named check result
-  debug:
-    msg: "named check result: {{ named_check }}"
-
+- name: Reload 1.168.192.in-addr.arpa zone
+  command: rndc reload 1.168.192.in-addr.arpa
+     
 - name: restart named, if its installed
   service:
     name: named

@@ -10,7 +10,7 @@
 // configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
 
 options {
-        listen-on port 53 { 127.0.0.1; 192.168.1.55; };
+        listen-on port 53 { 127.0.0.1; 192.168.1.56; };
         listen-on-v6 port 53 { ::1; };
         directory       "/var/named";
         dump-file       "/var/named/data/cache_dump.db";
@@ -18,9 +18,8 @@ options {
         memstatistics-file "/var/named/data/named_mem_stats.txt";
         recursing-file  "/var/named/data/named.recursing";
         secroots-file   "/var/named/data/named.secroots";
-        allow-query     { localhost; 192.168.1.0/24; };
-        allow-transfer  { localhost; 192.168.1.56; };
-        also-notify     { 192.168.1.56; };
+        also-notify     { 192.168.1.55; };
+        forwarders  { 8.8.8.8; 8.8.4.4; };
 
         /*
          - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
@@ -58,18 +57,18 @@ zone "." IN {
         file "named.ca";
 };
 
-# FORWARD LOOKUP ZONE
+#FORWARD LOOKUP ZONE
 zone "ziyotek.local" IN {
-        type master;
-        file "ziyotek.flz";
-        allow-update { none; };
+        type slave;
+        file "slaves/ziyotek.flz";
+        masters { 192.168.1.55; };
 };
 
-# REVERSE LOOKUP ZONE
+#REVERSE LOOKUP ZONE
 zone "1.168.192.in-addr.arpa" IN {
-         type master;
-         file "ziyotek.rlz";
-         allow-update { none; };
+         type slave;
+         file "slaves/ziyotek.rlz";
+         masters { 192.168.1.55; };
 };
 
 include "/etc/named.rfc1912.zones";
