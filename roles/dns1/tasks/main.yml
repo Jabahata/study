@@ -2,7 +2,6 @@
 - name: making cache
   yum:
     update_cache: yes
-    cache_valid_time: 3600
 
 - name: updating packages
   yum:
