@@ -2,6 +2,7 @@
 - name: making cache
   yum:
     update_cache: yes
+    clean: all
 
 - name: updating package
   yum:
