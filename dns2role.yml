@@ -1,7 +1,7 @@
 ---
-- name: dns1 192.168.1.55 from scratch
-  hosts: dns1
+- name: dns1 192.168.1.56 from scratch
+  hosts: dns2
   become: yes
 
   roles:
-  - dns1
+  - dns2

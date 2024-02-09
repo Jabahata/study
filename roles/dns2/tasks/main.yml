@@ -2,7 +2,6 @@
 - name: making cache
   yum:
     update_cache: yes
-    clean: all
     
 - name: updating packages
   yum:
@@ -84,12 +83,6 @@
     dest: /etc/named.conf
     backup: yes
 
-- name: Reload ziyotek.local zone
-  command: rndc reload ziyotek.local
-
-- name: Reload 1.168.192.in-addr.arpa zone
-  command: rndc reload 1.168.192.in-addr.arpa
-     
 - name: restart named, if its installed
   service:
     name: named
@@ -102,6 +95,12 @@
     state: started
     enabled: yes
   when: not named_check.stat.exists
+
+- name: Reload ziyotek.local zone
+  command: rndc reload ziyotek.local
+
+- name: Reload 1.168.192.in-addr.arpa zone
+  command: rndc reload 1.168.192.in-addr.arpa
 
 - name: setting firewall rules for ntp
   firewalld:
