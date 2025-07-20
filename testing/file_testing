@@ -1,7 +1,0 @@
-TASK:
-create new branch named "assignment"
-change your branch to the assignment
-create a directory within that branch named "new_branch_folder"
-create file inside that directory called "ziyotek.txt"
-add, commit, and push into newly created branch
-you should be able to see your branch in your remote repo
